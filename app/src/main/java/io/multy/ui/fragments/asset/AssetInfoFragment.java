@@ -348,28 +348,13 @@ public class AssetInfoFragment extends BaseFragment implements AppBarLayout.OnOf
     @OnClick(R.id.button_share)
     void onClickShare() {
         Analytics.getInstance(getActivity()).logWallet(AnalyticsConstants.WALLET_SHARE, viewModel.getChainId());
-        Intent sharingIntent = new Intent(ACTION_SEND);
-        sharingIntent.setType("text/plain");
-        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, getAddressToShare());
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-            Intent intentReceiver = new Intent(getActivity(), SharingBroadcastReceiver.class);
-            intentReceiver.putExtra(getString(R.string.chain_id), viewModel.getChainId());
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, intentReceiver, PendingIntent.FLAG_CANCEL_CURRENT);
-            startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.send_via), pendingIntent.getIntentSender()));
-        } else {
-            startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.send_via)));
-        }
+        viewModel.share(getActivity(), getAddressToShare());
     }
 
     @OnClick(R.id.text_address)
     void onClickCopy() {
         Analytics.getInstance(getActivity()).logWallet(AnalyticsConstants.WALLET_ADDRESS, viewModel.getChainId());
-        String address = getAddressToShare();
-        ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText(address, address);
-        assert clipboard != null;
-        clipboard.setPrimaryClip(clip);
-        Toast.makeText(getActivity(), R.string.address_copied, Toast.LENGTH_SHORT).show();
+        viewModel.copyToClipboard(getActivity(), getAddressToShare());
     }
 
     @OnClick(R.id.close)
